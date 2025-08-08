@@ -5,60 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Face Prompt Builder</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        accent: '#10b981',
+                        dark: '#1f2937',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            background-color: #f3f4f6;
+            transform: translateY(-2px);
+        }
+        .slider-container {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .slider-container.open {
+            max-height: 100px;
+        }
+        .prompt-box {
+            min-height: 150px;
+            background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+        }
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .slider-thumb::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <div class="container mx-auto p-4 max-w-6xl">
-        <h1 class="text-2xl font-bold text-center mb-6">Face Prompt Builder</h1>
+<body class="bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 py-6">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <div class="flex items-center justify-center mb-3">
+                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                <h1 class="text-3xl md:text-4xl font-bold text-dark ml-4">Face Prompt Builder</h1>
+            </div>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Refine suspect images by adjusting facial features. Select features from the list or create custom adjustments.
+            </p>
+        </header>
         
-        <div class="flex flex-col md:flex-row gap-4">
-            <!-- Left Sidebar -->
-            <div class="w-full md:w-1/4 bg-white p-4 rounded-lg shadow">
-                <h2 class="text-lg font-semibold mb-3">Facial Features</h2>
-                <input 
-                    type="text" 
-                    id="featureSearch" 
-                    placeholder="Search features..." 
-                    class="w-full p-2 border border-gray-300 rounded mb-3"
-                >
-                <div class="h-96 overflow-y-auto">
-                    <div id="featureList" class="space-y-2">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Left Sidebar - Features List -->
+            <div class="w-full lg:w-1/4">
+                <div class="bg-white rounded-xl shadow-md p-4 mb-4">
+                    <h2 class="text-lg font-semibold text-dark mb-3 flex items-center">
+                        <i class="fas fa-search mr-2 text-primary"></i>Search Features
+                    </h2>
+                    <input 
+                        type="text" 
+                        id="featureSearch" 
+                        placeholder="Search facial features..." 
+                        class="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-md p-4">
+                    <h2 class="text-lg font-semibold text-dark mb-3 flex items-center">
+                        <i class="fas fa-list mr-2 text-primary"></i>Common Features
+                    </h2>
+                    <div class="grid feature-grid grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-2 max-h-[400px] overflow-y-auto pr-2">
                         <!-- Features will be populated by JavaScript -->
                     </div>
                 </div>
             </div>
             
-            <!-- Main Content -->
-            <div class="w-full md:w-3/4 bg-white p-4 rounded-lg shadow">
-                <h2 class="text-lg font-semibold mb-3">Feature Details</h2>
-                
-                <div id="featureEntries" class="space-y-4 mb-6">
-                    <!-- Feature entry templates will be added here -->
+            <!-- Main Content - Feature Adjustments -->
+            <div class="w-full lg:w-3/4">
+                <div class="bg-white rounded-xl shadow-md p-5 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-dark">Feature Adjustments</h2>
+                        <button 
+                            id="addFeatureBtn" 
+                            class="bg-primary hover:bg-secondary text-white py-2 px-4 rounded-lg flex items-center transition"
+                        >
+                            <i class="fas fa-plus mr-2"></i> Add Feature
+                        </button>
+                    </div>
+                    
+                    <div id="featureEntries" class="space-y-4">
+                        <!-- Feature entries will be added here -->
+                    </div>
                 </div>
                 
-                <button 
-                    id="addFeatureBtn" 
-                    class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mb-6"
-                >
-                    + Add Feature
-                </button>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-2">Combined Prompt</label>
-                    <textarea 
-                        id="combinedPrompt" 
-                        rows="6" 
-                        class="w-full p-3 border border-gray-300 rounded"
-                    ></textarea>
+                <!-- Combined Prompt Section -->
+                <div class="bg-white rounded-xl shadow-md p-5">
+                    <h2 class="text-xl font-bold text-dark mb-4">Combined Prompt</h2>
+                    
+                    <div class="prompt-box rounded-lg p-4 mb-4 border border-gray-200">
+                        <textarea 
+                            id="combinedPrompt" 
+                            rows="4"
+                            class="w-full h-full bg-transparent resize-none focus:outline-none"
+                            placeholder="Your combined prompt will appear here..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="text-sm text-gray-600 flex items-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            The prompt will be copied with an editing instruction
+                        </div>
+                        <button 
+                            id="copyPromptBtn" 
+                            class="bg-accent hover:bg-green-700 text-white font-semibold py-3 px-8 rounded-lg flex items-center transition whitespace-nowrap"
+                        >
+                            <i class="fas fa-copy mr-2"></i> Copy Prompt
+                        </button>
+                    </div>
                 </div>
-                
-                <button 
-                    id="copyPromptBtn" 
-                    class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded"
-                >
-                    Copy Prompt
-                </button>
             </div>
         </div>
+        
+        <!-- Footer -->
+        <footer class="mt-10 text-center text-gray-600 text-sm">
+            <p>Face Prompt Builder • All data stored locally in your browser</p>
+        </footer>
     </div>
 
     <script>
@@ -73,7 +168,7 @@
             
             // DOM elements
             const featureSearch = document.getElementById('featureSearch');
-            const featureList = document.getElementById('featureList');
+            const featureList = document.querySelector('.feature-grid');
             const featureEntries = document.getElementById('featureEntries');
             const addFeatureBtn = document.getElementById('addFeatureBtn');
             const combinedPrompt = document.getElementById('combinedPrompt');
@@ -83,55 +178,85 @@
             let featuresData = JSON.parse(localStorage.getItem('facePromptFeatures')) || [];
             
             // Populate feature list
-            function populateFeatureList(filter = '') {
+            function populateFeatureList() {
                 featureList.innerHTML = '';
-                const filteredFeatures = facialFeatures.filter(feature => 
-                    feature.toLowerCase().includes(filter.toLowerCase())
-                );
+                const filter = featureSearch.value.toLowerCase();
                 
-                filteredFeatures.forEach(feature => {
-                    const div = document.createElement('div');
-                    div.className = 'p-2 hover:bg-gray-100 rounded cursor-pointer';
-                    div.textContent = feature;
-                    div.addEventListener('click', () => {
-                        addFeatureEntry(feature);
-                    });
-                    featureList.appendChild(div);
+                facialFeatures.forEach(feature => {
+                    if (feature.toLowerCase().includes(filter)) {
+                        const button = document.createElement('button');
+                        button.className = 'feature-card text-left p-3 rounded-lg border border-gray-200 hover:shadow-md transition';
+                        button.innerHTML = `
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                                    <i class="fas fa-plus text-primary text-sm"></i>
+                                </div>
+                                <span class="font-medium text-dark">${feature}</span>
+                            </div>
+                        `;
+                        button.addEventListener('click', () => {
+                            addFeatureEntry(feature);
+                        });
+                        featureList.appendChild(button);
+                    }
                 });
             }
             
             // Add a new feature entry
-            function addFeatureEntry(feature = '', details = '', saveToStorage = true) {
-                const entryId = Date.now();
+            function addFeatureEntry(feature = '', details = '', percentage = 0, saveToStorage = true) {
+                const entryId = Date.now() + Math.floor(Math.random() * 1000);
                 
                 const entryDiv = document.createElement('div');
-                entryDiv.className = 'feature-entry p-3 border border-gray-200 rounded';
+                entryDiv.className = 'feature-entry bg-gray-50 p-4 rounded-lg border border-gray-200';
                 entryDiv.dataset.id = entryId;
                 
                 entryDiv.innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-gray-700 text-sm font-medium mb-1">Feature</label>
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                        <div class="md:col-span-5">
+                            <label class="block text-gray-700 font-medium mb-1">Feature</label>
                             <input 
                                 type="text" 
-                                class="feature-input w-full p-2 border border-gray-300 rounded" 
+                                class="feature-input w-full p-3 border border-gray-300 rounded-lg" 
                                 value="${feature}" 
                                 placeholder="e.g., Eyes"
                             >
                         </div>
-                        <div>
-                            <label class="block text-gray-700 text-sm font-medium mb-1">Describe changes or details</label>
+                        <div class="md:col-span-5">
+                            <label class="block text-gray-700 font-medium mb-1">Describe changes or details</label>
                             <input 
                                 type="text" 
-                                class="details-input w-full p-2 border border-gray-300 rounded" 
+                                class="details-input w-full p-3 border border-gray-300 rounded-lg" 
                                 value="${details}" 
-                                placeholder="e.g., wider by 10%"
+                                placeholder="e.g., wider by 15%"
                             >
                         </div>
+                        <div class="md:col-span-2 flex items-end">
+                            <button class="remove-entry w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                    <button class="remove-entry mt-2 text-red-500 text-sm hover:text-red-700">
-                        Remove
-                    </button>
+                    
+                    <div class="mt-3 flex items-center">
+                        <button class="slider-toggle bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-3 py-2 text-sm transition">
+                            <i class="fas fa-sliders-h mr-2"></i>Adjust Percentage
+                        </button>
+                        <span class="ml-3 text-sm text-gray-600 hidden percentage-value">${percentage}%</span>
+                    </div>
+                    
+                    <div class="slider-container mt-3">
+                        <div class="flex items-center">
+                            <span class="text-sm text-gray-600 mr-3">-50%</span>
+                            <input 
+                                type="range" 
+                                min="-50" 
+                                max="50" 
+                                value="${percentage}"
+                                class="slider-thumb w-full h-2 bg-gray-300 rounded-lg appearance-none"
+                            >
+                            <span class="text-sm text-gray-600 ml-3">+50%</span>
+                        </div>
+                    </div>
                 `;
                 
                 featureEntries.appendChild(entryDiv);
@@ -139,6 +264,24 @@
                 // Add event listeners
                 entryDiv.querySelector('.feature-input').addEventListener('input', updateCombinedPrompt);
                 entryDiv.querySelector('.details-input').addEventListener('input', updateCombinedPrompt);
+                
+                // Slider functionality
+                const slider = entryDiv.querySelector('input[type="range"]');
+                const sliderToggle = entryDiv.querySelector('.slider-toggle');
+                const sliderContainer = entryDiv.querySelector('.slider-container');
+                const percentageValue = entryDiv.querySelector('.percentage-value');
+                
+                sliderToggle.addEventListener('click', () => {
+                    sliderContainer.classList.toggle('open');
+                    percentageValue.classList.toggle('hidden');
+                });
+                
+                slider.addEventListener('input', function() {
+                    percentageValue.textContent = `${this.value}%`;
+                    updateCombinedPrompt();
+                });
+                
+                // Remove button
                 entryDiv.querySelector('.remove-entry').addEventListener('click', () => {
                     entryDiv.remove();
                     featuresData = featuresData.filter(item => item.id !== entryId);
@@ -150,7 +293,8 @@
                     featuresData.push({
                         id: entryId,
                         feature,
-                        details
+                        details,
+                        percentage
                     });
                     saveFeatures();
                 }
@@ -166,13 +310,21 @@
                 entries.forEach(entry => {
                     const feature = entry.querySelector('.feature-input').value.trim();
                     const details = entry.querySelector('.details-input').value.trim();
+                    const percentage = entry.querySelector('input[type="range"]').value;
+                    const percentageVisible = !entry.querySelector('.percentage-value').classList.contains('hidden');
                     
-                    if (feature && details) {
-                        promptParts.push(`${feature}: ${details}`);
+                    if (feature) {
+                        let featureText = feature;
+                        if (details) featureText += `: ${details}`;
+                        if (percentageVisible && percentage != 0) {
+                            featureText += ` ${percentage > 0 ? '+' : ''}${percentage}%`;
+                        }
+                        promptParts.push(featureText);
                     }
                 });
                 
                 combinedPrompt.value = promptParts.join(', ');
+                saveFeatures();
             }
             
             // Save features to local storage
@@ -184,7 +336,8 @@
                     featuresData.push({
                         id: entry.dataset.id,
                         feature: entry.querySelector('.feature-input').value,
-                        details: entry.querySelector('.details-input').value
+                        details: entry.querySelector('.details-input').value,
+                        percentage: parseInt(entry.querySelector('input[type="range"]').value)
                     });
                 });
                 
@@ -195,21 +348,23 @@
             function copyPrompt() {
                 const fullPrompt = `${combinedPrompt.value}\nEditing suspect image - apply above changes to current image version.`;
                 navigator.clipboard.writeText(fullPrompt).then(() => {
-                    alert('Prompt copied to clipboard!');
+                    // Show feedback
+                    const originalText = copyPromptBtn.innerHTML;
+                    copyPromptBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                    copyPromptBtn.classList.remove('bg-accent');
+                    copyPromptBtn.classList.add('bg-green-600');
+                    
+                    setTimeout(() => {
+                        copyPromptBtn.innerHTML = originalText;
+                        copyPromptBtn.classList.remove('bg-green-600');
+                        copyPromptBtn.classList.add('bg-accent');
+                    }, 2000);
                 });
             }
             
             // Event listeners
-            featureSearch.addEventListener('input', (e) => {
-                populateFeatureList(e.target.value);
-            });
-            
-            addFeatureBtn.addEventListener('click', () => {
-                addFeatureEntry();
-            });
-            
-            combinedPrompt.addEventListener('input', saveFeatures);
-            
+            featureSearch.addEventListener('input', populateFeatureList);
+            addFeatureBtn.addEventListener('click', () => addFeatureEntry());
             copyPromptBtn.addEventListener('click', copyPrompt);
             
             // Initialize
@@ -218,12 +373,19 @@
             // Load saved features
             if (featuresData.length > 0) {
                 featuresData.forEach(feature => {
-                    addFeatureEntry(feature.feature, feature.details, false);
+                    addFeatureEntry(
+                        feature.feature, 
+                        feature.details, 
+                        feature.percentage, 
+                        false
+                    );
                 });
                 updateCombinedPrompt();
             } else {
-                // Add one empty entry by default
-                addFeatureEntry();
+                // Add two example entries
+                addFeatureEntry('Face Shape', 'more oval', 0, false);
+                addFeatureEntry('Eyes', 'wider', 15, false);
+                updateCombinedPrompt();
             }
         });
     </script>
