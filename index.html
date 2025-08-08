@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Suspect Face Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .tab-button {
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffcc00;
+            border-radius: 50px;
+            color: #ffcc00;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-button:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+        
+        .tab-button.active {
+            background: #ffcc00;
+            color: #1a1a2e;
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #444;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            background: rgba(50, 50, 50, 0.8);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .color-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .accessory-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(50, 50, 50, 0.5);
+            border-radius: 8px;
+        }
+        
+        .accessory-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+        }
+        
+        .accessory-details {
+            flex-grow: 1;
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .accessory-item.active .accessory-details {
+            display: block;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .adjustment-slider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(50, 50, 50, 0.5);
+            border-radius: 8px;
+        }
+        
+        .slider-label {
+            min-width: 150px;
+        }
+        
+        .slider {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: #555;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffcc00;
+            cursor: pointer;
+        }
+        
+        .output-section {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .output-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .prompt-output {
+            background: rgba(50, 50, 50, 0.8);
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: #ffcc00;
+            color: #1a1a2e;
+        }
+        
+        .btn-primary:hover {
+            background: #ffd633;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid #ffcc00;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 204, 0, 0.2);
+        }
+        
+        .character-preview {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .character-placeholder {
+            width: 200px;
+            height: 250px;
+            background: rgba(50, 50, 50, 0.5);
+            border: 3px dashed #ffcc00;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab-button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-user-secret"></i> AI Suspect Face Generator</h1>
+            <p class="subtitle">Provide detailed descriptions to generate accurate facial composites for suspect identification. Export prompts for ChatGPT image generation.</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-button active" data-tab="new">Create New Description</button>
+            <button class="tab-button" data-tab="edit">Edit Existing Prompt</button>
+        </div>
+        
+        <!-- New Description Tab -->
+        <div id="new-tab" class="tab-content active">
+            <form id="suspect-form">
+                <!-- Demographics Section -->
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-user"></i> Demographics</h2>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <select id="age">
+                                <option value="child">Child (0-12)</option>
+                                <option value="teen">Teen (13-19)</option>
+                                <option value="young-adult">Young Adult (20-35)</option>
+                                <option value="middle-aged">Middle-aged (36-55)</option>
+                                <option value="senior">Senior (56+)</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="ethnicity">Ethnicity</label>
+                            <select id="ethnicity">
+                                <option value="caucasian">Caucasian</option>
+                                <option value="african">African/Afro-Caribbean</option>
+                                <option value="east-asian">East Asian</option>
+                                <option value="south-asian">South Asian</option>
+                                <option value="hispanic">Hispanic/Latino</option>
+                                <option value="middle-eastern">Middle Eastern</option>
+                                <option value="mixed">Mixed Race</option>
+                                <option value="other">Other/Unknown</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="build">Body Build</label>
+                            <select id="build">
+                                <option value="slim">Slim</option>
+                                <option value="average">Average</option>
+                                <option value="athletic">Athletic/Muscular</option>
+                                <option value="overweight">Overweight</option>
+                                <option value="obese">Obese</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Facial Features Section -->
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-eye"></i> Facial Features</h2>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="face-shape">Face Shape</label>
+                            <select id="face-shape">
+                                <option value="oval">Oval</option>
+                                <option value="round">Round</option>
+                                <option value="square">Square</option>
+                                <option value="heart">Heart-shaped</option>
+                                <option value="long">Long</option>
+                                <option value="diamond">Diamond</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="skin-tone">Skin Tone</label>
+                            <select id="skin-tone">
+                                <option value="porcelain">Porcelain</option>
+                                <option value="fair">Fair</option>
+                                <option value="light">Light</option>
+                                <option value="medium">Medium</option>
+                                <option value="olive">Olive</option>
+                                <option value="tan">Tan</option>
+                                <option value="brown">Brown</option>
+                                <option value="dark">Dark</option>
+                                <option value="ebony">Ebony</option>
+                                <option value="custom">Custom (use color picker)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="skin-color">Skin Color (Hex)</label>
+                        <div class="color-container">
+                            <input type="color" id="skin-color-picker" value="#e0ac69">
+                            <input type="text" id="skin-color" value="#e0ac69" placeholder="#hex">
+                            <div class="color-preview" id="skin-preview" style="background-color: #e0ac69;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="eye-color">Eye Color</label>
+                            <select id="eye-color">
+                                <option value="brown">Brown</option>
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="hazel">Hazel</option>
+                                <option value="gray">Gray</option>
+                                <option value="amber">Amber</option>
+                                <option value="custom">Custom (use color picker)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="eye-shape">Eye Shape</label>
+                            <select id="eye-shape">
+                                <option value="almond">Almond</option>
+                                <option value="round">Round</option>
+                                <option value="hooded">Hooded</option>
+                                <option value="monolid">Monolid</option>
+                                <option value="downturned">Downturned</option>
+                                <option value="upturned">Upturned</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="eye-color-custom">Eye Color (Hex)</label>
+                        <div class="color-container">
+                            <input type="color" id="eye-color-picker" value="#8b4513">
+                            <input type="text" id="eye-color-custom" value="#8b4513" placeholder="#hex">
+                            <div class="color-preview" id="eye-preview" style="background-color: #8b4513;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="hair-color">Hair Color</label>
+                            <select id="hair-color">
+                                <option value="black">Black</option>
+                                <option value="brown">Brown</option>
+                                <option value="blonde">Blonde</option>
+                                <option value="red">Red</option>
+                                <option value="gray">Gray/White</option>
+                                <option value="auburn">Auburn</option>
+                                <option value="custom">Custom (use color picker)</option>
+                                <option value="bald">Bald</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hair-style">Hair Style</label>
+                            <select id="hair-style">
+                                <option value="short">Short</option>
+                                <option value="medium">Medium</option>
+                                <option value="long">Long</option>
+                                <option value="afro">Afro</option>
+                                <option value="dreadlocks">Dreadlocks</option>
+                                <option value="braids">Braids</option>
+                                <option value="ponytail">Ponytail</option>
+                                <option value="bun">Bun</option>
+                                <option value="mohawk">Mohawk</option>
+                                <option value="shaved">Shaved</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hair-color-custom">Hair Color (Hex)</label>
+                        <div class="color-container">
+                            <input type="color" id="hair-color-picker" value="#000000">
+                            <input type="text" id="hair-color-custom" value="#000000" placeholder="#hex">
+                            <div class="color-preview" id="hair-preview" style="background-color: #000000;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label for="facial-hair">Facial Hair</label>
+                            <select id="facial-hair">
+                                <option value="none">None</option>
+                                <option value="clean-shaven">Clean Shaven</option>
+                                <option value="stubble">Stubble</option>
+                                <option value="goatee">Goatee</option>
+                                <option value="mustache">Mustache</option>
+                                <option value="beard">Full Beard</option>
+                                <option value="sideburns">Sideburns</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="facial-hair-color">Facial Hair Color</label>
+                            <select id="facial-hair-color">
+                                <option value="same">Same as Hair</option>
+                                <option value="black">Black</option>
+                                <option value="brown">Brown</option>
+                                <option value="blonde">Blonde</option>
+                                <option value="red">Red</option>
+                                <option value="gray">Gray</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Accessories Section -->
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-glasses"></i> Accessories & Distinguishing Features</h2>
+                    
+                    <div class="accessory-item">
+                        <input type="checkbox" id="glasses">
+                        <label for="glasses">Glasses</label>
+                        <div class="accessory-details">
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label for="glasses-type">Type</label>
+                                    <select id="glasses-type">
+                                        <option value="reading">Reading Glasses</option>
+                                        <option value="sunglasses">Sunglasses</option>
+                                        <option value="aviator">Aviator</option>
+                                        <option value="wayfarer">Wayfarer</option>
+                                        <option value="round">Round</option>
+                                        <option value="cat-eye">Cat-eye</option>
+                                        <option value="rimless">Rimless</option>
+                                        <option value="bifocals">Bifocals</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="glasses-color">Color</label>
+                                    <input type="text" id="glasses-color" placeholder="e.g., black, gold, transparent">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accessory-item">
+                        <input type="checkbox" id="hat">
+                        <label for="hat">Hat/Headwear</label>
+                        <div class="accessory-details">
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label for="hat-type">Type</label>
+                                    <select id="hat-type">
+                                        <option value="baseball">Baseball Cap</option>
+                                        <option value="beanie">Beanie</option>
+                                        <option value="fedora">Fedora</option>
+                                        <option value="bucket">Bucket Hat</option>
+                                        <option value="cowboy">Cowboy Hat</option>
+                                        <option value="hood">Hood</option>
+                                        <option value="headscarf">Headscarf</option>
+                                        <option value="turban">Turban</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hat-color">Color</label>
+                                    <input type="text" id="hat-color" placeholder="e.g., red, blue, camouflage">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accessory-item">
+                        <input type="checkbox" id="jewelry">
+                        <label for="jewelry">Jewelry</label>
+                        <div class="accessory-details">
+                            <div class="form-group">
+                                <label for="jewelry-desc">Description</label>
+                                <textarea id="jewelry-desc" placeholder="e.g., gold chain necklace, nose ring, multiple ear piercings, large silver watch"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accessory-item">
+                        <input type="checkbox" id="tattoos">
+                        <label for="tattoos">Tattoos/Markings</label>
+                        <div class="accessory-details">
+                            <div class="form-group">
+                                <label for="tattoos-desc">Description</label>
+                                <textarea id="tattoos-desc" placeholder="e.g., dragon tattoo on right arm, scar on left cheek, birthmark on forehead"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expression">Facial Expression</label>
+                        <select id="expression">
+                            <option value="neutral">Neutral</option>
+                            <option value="angry">Angry</option>
+                            <option value="happy">Happy/Smiling</option>
+                            <option value="sad">Sad</option>
+                            <option value="surprised">Surprised</option>
+                            <option value="fearful">Fearful</option>
+                            <option value="disgusted">Disgusted</option>
+                            <option value="contempt">Contempt</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Additional Details -->
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-file-alt"></i> Additional Details</h2>
+                    <div class="form-group">
+                        <label for="additional-details">Other Distinguishing Features</label>
+                        <textarea id="additional-details" placeholder="Add any additional details that might help identify the person (e.g., posture, mannerisms, voice, clothing, etc.)"></textarea>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" id="generate-btn" class="btn btn-primary">
+                        <i class="fas fa-cogs"></i> Generate Prompt
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Edit Prompt Tab -->
+        <div id="edit-tab" class="tab-content">
+            <div class="form-section">
+                <h2 class="form-title"><i class="fas fa-edit"></i> Edit Existing Prompt</h2>
+                
+                <div class="form-group">
+                    <label for="original-prompt">Original Prompt</label>
+                    <textarea id="original-prompt" placeholder="Paste your existing prompt here..."></textarea>
+                </div>
+                
+                <h3 class="form-title"><i class="fas fa-sliders-h"></i> Adjustments</h3>
+                
+                <div class="adjustment-slider">
+                    <div class="slider-label">Face Roundness</div>
+                    <input type="range" min="-10" max="10" value="0" class="slider" id="face-roundness">
+                    <div id="face-roundness-value">0 (neutral)</div>
+                </div>
+                
+                <div class="adjustment-slider">
+                    <div class="slider-label">Nose Size</div>
+                    <input type="range" min="-10" max="10" value="0" class="slider" id="nose-size">
+                    <div id="nose-size-value">0 (neutral)</div>
+                </div>
+                
+                <div class="adjustment-slider">
+                    <div class="slider-label">Eye Size</div>
+                    <input type="range" min="-10" max="10" value="0" class="slider" id="eye-size">
+                    <div id="eye-size-value">0 (neutral)</div>
+                </div>
+                
+                <div class="adjustment-slider">
+                    <div class="slider-label">Lip Fullness</div>
+                    <input type="range" min="-10" max="10" value="0" class="slider" id="lip-fullness">
+                    <div id="lip-fullness-value">0 (neutral)</div>
+                </div>
+                
+                <div class="adjustment-slider">
+                    <div class="slider-label">Jawline Definition</div>
+                    <input type="range" min="-10" max="10" value="0" class="slider" id="jawline">
+                    <div id="jawline-value">0 (neutral)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="specific-adjustments">Specific Adjustments</label>
+                    <textarea id="specific-adjustments" placeholder="Enter specific adjustments (e.g., 'make the eyebrows thicker', 'add more wrinkles', 'lighten the skin tone')"></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" id="update-btn" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> Update Prompt
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Output Section -->
+        <div class="output-section">
+            <h2 class="output-title"><i class="fas fa-file-code"></i> Generated Prompt</h2>
+            <div class="prompt-output" id="prompt-output">
+                Your generated prompt will appear here...
+            </div>
+            
+            <div class="character-preview">
+                <div class="character-placeholder">
+                    <i class="fas fa-user fa-3x"></i>
+                    <div>Preview will appear after generation</div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" id="copy-btn" class="btn btn-secondary">
+                    <i class="fas fa-copy"></i> Copy to Clipboard
+                </button>
+                <button type="button" id="download-btn" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download as Text File
+                </button>
+                <button type="button" id="send-chatgpt" class="btn btn-secondary">
+                    <i class="fas fa-paper-plane"></i> Prepare for ChatGPT
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>AI Suspect Face Generator v1.0 | Designed for law enforcement and security professionals</p>
+            <p>Note: This tool generates descriptive prompts only. Actual image generation requires ChatGPT or similar AI service.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active tab button
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show active tab content
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                const tabId = button.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Accessory details toggle
+        document.querySelectorAll('.accessory-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const item = checkbox.closest('.accessory-item');
+                if (checkbox.checked) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+        
+        // Color pickers
+        function setupColorPicker(pickerId, inputId, previewId) {
+            const picker = document.getElementById(pickerId);
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            picker.addEventListener('input', () => {
+                input.value = picker.value;
+                preview.style.backgroundColor = picker.value;
+            });
+            
+            input.addEventListener('input', () => {
+                if (/^#[0-9A-F]{6}$/i.test(input.value)) {
+                    picker.value = input.value;
+                    preview.style.backgroundColor = input.value;
+                }
+            });
+        }
+        
+        setupColorPicker('skin-color-picker', 'skin-color', 'skin-preview');
+        setupColorPicker('eye-color-picker', 'eye-color-custom', 'eye-preview');
+        setupColorPicker('hair-color-picker', 'hair-color-custom', 'hair-preview');
+        
+        // Sliders
+        function setupSlider(sliderId, valueId, label) {
+            const slider = document.getElementById(sliderId);
+            const valueDisplay = document.getElementById(valueId);
+            
+            slider.addEventListener('input', () => {
+                const value = parseInt(slider.value);
+                let description = '';
+                
+                if (value < -5) description = `very ${label.negative}`;
+                else if (value < 0) description = `${label.negative}`;
+                else if (value === 0) description = 'neutral';
+                else if (value <= 5) description = `${label.positive}`;
+                else description = `very ${label.positive}`;
+                
+                valueDisplay.textContent = `${value} (${description})`;
+            });
+        }
+        
+        setupSlider('face-roundness', 'face-roundness-value', {
+            negative: 'angular',
+            positive: 'round'
+        });
+        
+        setupSlider('nose-size', 'nose-size-value', {
+            negative: 'small',
+            positive: 'large'
+        });
+        
+        setupSlider('eye-size', 'eye-size-value', {
+            negative: 'small',
+            positive: 'large'
+        });
+        
+        setupSlider('lip-fullness', 'lip-fullness-value', {
+            negative: 'thin',
+            positive: 'full'
+        });
+        
+        setupSlider('jawline', 'jawline-value', {
+            negative: 'soft',
+            positive: 'defined'
+        });
+        
+        // Generate prompt
+        document.getElementById('generate-btn').addEventListener('click', generatePrompt);
+        document.getElementById('update-btn').addEventListener('click', updatePrompt);
+        
+        function generatePrompt() {
+            const gender = document.getElementById('gender').value;
+            const age = document.getElementById('age').value;
+            const ethnicity = document.getElementById('ethnicity').value;
+            const build = document.getElementById('build').value;
+            const faceShape = document.getElementById('face-shape').value;
+            const skinTone = document.getElementById('skin-tone').value === 'custom' ? 
+                `custom skin color (${document.getElementById('skin-color').value})` : 
+                document.getElementById('skin-tone').value;
+            const eyeColor = document.getElementById('eye-color').value === 'custom' ? 
+                `custom eye color (${document.getElementById('eye-color-custom').value})` : 
+                document.getElementById('eye-color').value;
+            const eyeShape = document.getElementById('eye-shape').value;
+            const hairColor = document.getElementById('hair-color').value === 'custom' ? 
+                `custom hair color (${document.getElementById('hair-color-custom').value})` : 
+                document.getElementById('hair-color').value;
+            const hairStyle = document.getElementById('hair-style').value;
+            const facialHair = document.getElementById('facial-hair').value;
+            const expression = document.getElementById('expression').value;
+            const additional = document.getElementById('additional-details').value;
+            
+            // Accessories
+            let accessories = [];
+            if (document.getElementById('glasses').checked) {
+                const type = document.getElementById('glasses-type').value;
+                const color = document.getElementById('glasses-color').value;
+                accessories.push(`${color} ${type}`);
+            }
+            if (document.getElementById('hat').checked) {
+                const type = document.getElementById('hat-type').value;
+                const color = document.getElementById('hat-color').value;
+                accessories.push(`${color} ${type}`);
+            }
+            if (document.getElementById('jewelry').checked) {
+                accessories.push(document.getElementById('jewelry-desc').value);
+            }
+            if (document.getElementById('tattoos').checked) {
+                accessories.push(`Distinguishing marks: ${document.getElementById('tattoos-desc').value}`);
+            }
+            
+            // Construct prompt
+            let prompt = `Generate a realistic facial composite of a suspect with the following characteristics:\n\n`;
+            prompt += `- Gender: ${gender}\n`;
+            prompt += `- Age: ${age}\n`;
+            prompt += `- Ethnicity: ${ethnicity}\n`;
+            prompt += `- Build: ${build}\n`;
+            prompt += `- Face shape: ${faceShape}\n`;
+            prompt += `- Skin tone: ${skinTone}\n`;
+            prompt += `- Eyes: ${eyeShape} shaped, ${eyeColor} color\n`;
+            prompt += `- Hair: ${hairStyle} length, ${hairColor}\n`;
+            prompt += `- Facial hair: ${facialHair}\n`;
+            prompt += `- Expression: ${expression}\n`;
+            
+            if (accessories.length > 0) {
+                prompt += `- Accessories: ${accessories.join(', ')}\n`;
+            }
+            
+            if (additional) {
+                prompt += `- Additional details: ${additional}\n`;
+            }
+            
+            prompt += `\nGenerate a photorealistic facial composite in a neutral police sketch style.`;
+            
+            document.getElementById('prompt-output').textContent = prompt;
+        }
+        
+        function updatePrompt() {
+            const original = document.getElementById('original-prompt').value;
+            if (!original.trim()) {
+                alert('Please enter an original prompt to edit');
+                return;
+            }
+            
+            const adjustments = [];
+            
+            // Slider adjustments
+            const faceRoundness = parseInt(document.getElementById('face-roundness').value);
+            if (faceRoundness !== 0) {
+                adjustments.push(`Adjust face to be ${faceRoundness > 0 ? 'rounder' : 'more angular'}`);
+            }
+            
+            const noseSize = parseInt(document.getElementById('nose-size').value);
+            if (noseSize !== 0) {
+                adjustments.push(`Adjust nose to be ${noseSize > 0 ? 'larger' : 'smaller'}`);
+            }
+            
+            const eyeSize = parseInt(document.getElementById('eye-size').value);
+            if (eyeSize !== 0) {
+                adjustments.push(`Adjust eyes to be ${eyeSize > 0 ? 'larger' : 'smaller'}`);
+            }
+            
+            const lipFullness = parseInt(document.getElementById('lip-fullness').value);
+            if (lipFullness !== 0) {
+                adjustments.push(`Adjust lips to be ${lipFullness > 0 ? 'fuller' : 'thinner'}`);
+            }
+            
+            const jawline = parseInt(document.getElementById('jawline').value);
+            if (jawline !== 0) {
+                adjustments.push(`Adjust jawline to be ${jawline > 0 ? 'more defined' : 'softer'}`);
+            }
+            
+            // Specific adjustments
+            const specific = document.getElementById('specific-adjustments').value;
+            if (specific) {
+                adjustments.push(specific);
+            }
+            
+            // Construct updated prompt
+            let prompt = original + '\n\nModify the facial composite with these adjustments:\n';
+            prompt += adjustments.map(adj => `- ${adj}`).join('\n');
+            
+            document.getElementById('prompt-output').textContent = prompt;
+        }
+        
+        // Output actions
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            const text = document.getElementById('prompt-output').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Prompt copied to clipboard!');
+            });
+        });
+        
+        document.getElementById('download-btn').addEventListener('click', () => {
+            const text = document.getElementById('prompt-output').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'suspect_prompt.txt';
+            document.body.appendChild(a);
+            a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        });
+        
+        document.getElementById('send-chatgpt').addEventListener('click', () => {
+            const text = document.getElementById('prompt-output').textContent;
+            const formatted = `[COPY THIS PROMPT TO CHATGPT]\n\n${text}\n\n[END PROMPT]`;
+            document.getElementById('prompt-output').textContent = formatted;
+            alert('Prompt formatted for ChatGPT. Copy and paste it into ChatGPT for image generation.');
+        });
+        
+        // Initialize with an example prompt
+        window.onload = () => {
+            document.getElementById('original-prompt').value = `Generate a realistic facial composite of a suspect:
+- Gender: male
+- Age: middle-aged
+- Ethnicity: caucasian
+- Build: average
+- Face shape: square
+- Skin tone: light
+- Eyes: almond shaped, brown color
+- Hair: short, black
+- Facial hair: clean-shaven
+- Expression: neutral
+
+Generate a photorealistic facial composite in a neutral police sketch style.`;
+        };
+    </script>
+</body>
+</html>
